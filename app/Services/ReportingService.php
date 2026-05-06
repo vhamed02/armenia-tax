@@ -127,7 +127,7 @@ class ReportingService
                 'account_type'   => $a->account_type,
                 'balance'        => $a->balance,
                 'is_primary'     => $a->is_primary,
-            ]),
+            ])->toArray(),
             'income_analysis' => $analysis,
             'anomalies'       => $anomalies,
             'tax_reports'     => $taxReports,
@@ -150,6 +150,88 @@ class ReportingService
         ]);
 
         return $report->fresh();
+    }
+
+    public function getTopUsersByExcess(int $limit = 10): array
+    {
+        $users = User::where('is_admin', false)
+            ->whereHas('kycProfile', fn($q) => $q->where('status', 'verified'))
+            ->with('kycProfile')
+            ->get();
+
+        $rows = [];
+        foreach ($users as $user) {
+            $analysis = $this->analyzer->analyzeUser($user, 'annual');
+            if ($analysis['excess_income'] > 0) {
+                $rows[] = [
+                    'id'             => $user->id,
+                    'name'           => $user->name,
+                    'national_id'    => $user->national_id,
+                    'risk_level'     => $user->kycProfile->risk_level,
+                    'income_limit'   => $analysis['income_limit'],
+                    'total_income'   => $analysis['total_income'],
+                    'excess_income'  => $analysis['excess_income'],
+                    'tax_due'        => $analysis['tax_breakdown']['tax_amount'],
+                ];
+            }
+        }
+
+        usort($rows, fn($a, $b) => $b['excess_income'] <=> $a['excess_income']);
+
+        return array_slice($rows, 0, $limit);
+    }
+
+    public function getAllUsersForAdmin(string $search = ''): array
+    {
+        $query = User::where('is_admin', false)
+            ->whereHas('kycProfile', fn($q) => $q->where('status', 'verified'))
+            ->with('kycProfile');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('national_id', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->get()->map(function ($user) {
+            $analysis = $this->analyzer->analyzeUser($user, 'annual');
+            return [
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'national_id'  => $user->national_id,
+                'risk_level'   => $user->kycProfile->risk_level,
+                'income_limit' => $analysis['income_limit'],
+                'total_income' => $analysis['total_income'],
+                'is_over_limit'=> $analysis['is_over_limit'],
+                'tax_due'      => $analysis['tax_breakdown']['tax_amount'],
+            ];
+        })->toArray();
+    }
+
+    public function getAllTaxReports(string $statusFilter = ''): array
+    {
+        $query = TaxReport::with('user')->orderByDesc('created_at');
+
+        if ($statusFilter !== '') {
+            $query->where('status', $statusFilter);
+        }
+
+        return $query->get()->map(fn($r) => [
+            'id'           => $r->id,
+            'user_id'      => $r->user_id,
+            'user_name'    => $r->user->name,
+            'national_id'  => $r->user->national_id,
+            'period_start' => $r->report_period_start->toDateString(),
+            'period_end'   => $r->report_period_end->toDateString(),
+            'total_income' => $r->total_income,
+            'income_limit' => $r->income_limit,
+            'excess_income'=> $r->excess_income,
+            'tax_rate'     => $r->tax_rate,
+            'tax_amount'   => $r->tax_amount,
+            'status'       => $r->status,
+            'submitted_at' => $r->submitted_to_gov_at?->toDateTimeString(),
+        ])->toArray();
     }
 
     public function getAnomaliesAcrossAllUsers(): array
