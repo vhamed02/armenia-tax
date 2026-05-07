@@ -83,7 +83,7 @@ class ReportingService
                 'source_type'      => $tx->source_type,
                 'is_flagged'       => $tx->is_flagged,
                 'external_reference' => $tx->external_reference,
-            ]);
+            ])->toArray();
 
         $taxReports = $user->taxReports()
             ->orderByDesc('created_at')
