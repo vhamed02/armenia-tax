@@ -50,34 +50,6 @@
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:24px;">
-        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#1a202c;">Recent Transactions</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Source</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Flagged</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(array_slice($report['transactions'], 0, 20) as $tx)
-                    <tr style="{{ $tx['is_flagged'] ? 'background:#fff5f5;' : '' }}">
-                        <td style="color:#718096;">{{ $tx['transaction_date'] }}</td>
-                        <td>{{ $tx['description'] }}</td>
-                        <td><span style="background:#edf2f7;color:#4a5568;padding:2px 8px;border-radius:4px;font-size:12px;">{{ $tx['source_type'] }}</span></td>
-                        <td><span style="color:{{ $tx['type'] === 'credit' ? '#38a169' : '#e53e3e' }};font-weight:500;">{{ ucfirst($tx['type']) }}</span></td>
-                        <td style="font-weight:600;">{{ number_format($tx['amount']) }} AMD</td>
-                        <td>{{ $tx['is_flagged'] ? '🚩' : '' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
     @if(!empty($platformActivity))
     <div class="card" style="margin-bottom:24px;">
         <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#1a202c;">Platform Activity</div>
@@ -162,4 +134,32 @@
         </table>
     </div>
     @endif
+
+    <div class="card" style="margin-bottom:24px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#1a202c;">Recent Transactions</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Source</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Flagged</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(array_slice($report['transactions'], 0, 20) as $tx)
+                    <tr style="{{ $tx['is_flagged'] ? 'background:#fff5f5;' : '' }}">
+                        <td style="color:#718096;">{{ $tx['transaction_date'] }}</td>
+                        <td>{{ $tx['description'] }}</td>
+                        <td><span style="background:#edf2f7;color:#4a5568;padding:2px 8px;border-radius:4px;font-size:12px;">{{ $tx['source_type'] }}</span></td>
+                        <td><span style="color:{{ $tx['type'] === 'credit' ? '#38a169' : '#e53e3e' }};font-weight:500;">{{ ucfirst($tx['type']) }}</span></td>
+                        <td style="font-weight:600;">{{ number_format($tx['amount']) }} AMD</td>
+                        <td>{{ $tx['is_flagged'] ? '🚩' : '' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -234,6 +234,77 @@ class ReportingService
         ])->toArray();
     }
 
+    public function getUnifiedTimeline(User $user): array
+    {
+        $bankTxs = $user->transactions()
+            ->with('serviceProvider')
+            ->orderByDesc('transaction_date')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn($tx) => [
+                'id'          => 'tx_' . $tx->id,
+                'datetime'    => $tx->transaction_date->toDateString(),
+                'sort_key'    => $tx->transaction_date->toDateString() . ' ' . $tx->created_at->format('H:i:s'),
+                'channel'     => 'bank',
+                'channel_label' => $tx->serviceProvider ? $tx->serviceProvider->name : 'Bank / Income',
+                'direction'   => $tx->transaction_type === 'credit' ? 'in' : 'out',
+                'amount'      => $tx->amount,
+                'description' => $tx->description ?? '—',
+                'source_type' => $tx->source_type,
+                'is_flagged'  => $tx->is_flagged,
+                'status'      => 'completed',
+                'meta'        => null,
+            ]);
+
+        $walletTxs = \App\Models\WalletTransaction::where('user_id', $user->id)
+            ->with('serviceProvider')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn($tx) => [
+                'id'          => 'wt_' . $tx->id,
+                'datetime'    => $tx->created_at->toDateString(),
+                'sort_key'    => $tx->created_at->format('Y-m-d H:i:s'),
+                'channel'     => 'casino',
+                'channel_label' => $tx->serviceProvider?->name ?? 'Casino',
+                'direction'   => $tx->type === 'deposit' ? 'in' : 'out',
+                'amount'      => $tx->amount,
+                'description' => ucfirst($tx->type) . ' — ' . ($tx->serviceProvider?->name ?? 'Casino'),
+                'source_type' => $tx->type,
+                'is_flagged'  => false,
+                'status'      => $tx->status,
+                'meta'        => [
+                    'balance_before' => $tx->balance_before,
+                    'balance_after'  => $tx->balance_after,
+                ],
+            ]);
+
+        $merged = $bankTxs->concat($walletTxs)
+            ->sortByDesc('sort_key')
+            ->values()
+            ->toArray();
+
+        return $merged;
+    }
+
+    public function getPlatformSummary(User $user): array
+    {
+        return $user->casinoProfiles()->with('serviceProvider')->get()->map(function ($profile) {
+            $txs    = $profile->walletTransactions()->where('status', 'completed')->get();
+            $lastTx = $profile->walletTransactions()->orderByDesc('created_at')->first();
+
+            return [
+                'provider_name'   => $profile->serviceProvider?->name ?? '—',
+                'provider_slug'   => $profile->serviceProvider?->slug ?? '—',
+                'kyc_status'      => $profile->kyc_status,
+                'wallet_balance'  => $profile->wallet_balance,
+                'total_deposited' => (int) $txs->where('type', 'deposit')->sum('amount'),
+                'total_withdrawn' => (int) $txs->where('type', 'withdrawal')->sum('amount'),
+                'tx_count'        => $txs->count(),
+                'last_activity'   => $lastTx?->created_at?->diffForHumans() ?? 'Never',
+            ];
+        })->toArray();
+    }
+
     public function getAnomaliesAcrossAllUsers(): array
     {
         $flagged = Transaction::where('is_flagged', true)

@@ -50,14 +50,14 @@ class AdminUserDetail extends Component
             ->orderByDesc('created_at')
             ->get()
             ->map(fn($t) => [
-                'id'            => $t->id,
-                'provider_name' => $t->serviceProvider?->name ?? '—',
-                'type'          => $t->type,
-                'amount'        => $t->amount,
-                'status'        => $t->status,
-                'balance_before'=> $t->balance_before,
-                'balance_after' => $t->balance_after,
-                'created_at'    => $t->created_at->format('M d, Y H:i'),
+                'id'             => $t->id,
+                'provider_name'  => $t->serviceProvider?->name ?? '—',
+                'type'           => $t->type,
+                'amount'         => $t->amount,
+                'status'         => $t->status,
+                'balance_before' => $t->balance_before,
+                'balance_after'  => $t->balance_after,
+                'created_at'     => $t->created_at->format('M d, Y H:i'),
             ])->toArray();
     }
 
