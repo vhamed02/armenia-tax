@@ -65,9 +65,13 @@
                         $nid = $profile['national_id_verified'] ?? '';
                         $masked = strlen($nid) > 4 ? substr($nid,0,3) . str_repeat('*', strlen($nid)-4) . substr($nid,-1) : $nid;
                     @endphp
-                    <div style="background:#00c85310;border:1px solid #00c85330;border-radius:8px;padding:8px 16px;display:flex;align-items:center;gap:10px;">
+                    <div style="background:#00c85310;border:1px solid #00c85330;border-radius:8px;padding:8px 16px;display:flex;align-items:center;gap:10px;" x-data="{ show: false }">
                         <span style="font-size:11px;color:#8892a4;">National ID</span>
-                        <span style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;">{{ $masked }}</span>
+                        <span style="font-size:14px;font-weight:700;color:#fff;font-family:monospace;" x-text="show ? '{{ $nid }}' : '{{ $masked }}'"></span>
+                        <button @click="show = !show" style="background:none;border:none;cursor:pointer;padding:2px;color:#8892a4;display:flex;align-items:center;" :title="show ? 'Hide' : 'Show'">
+                            <svg x-show="!show" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg x-show="show" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
                     </div>
                 </div>
 
