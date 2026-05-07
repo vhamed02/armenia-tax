@@ -10,6 +10,7 @@ class Transaction extends Model
     protected $fillable = [
         'bank_account_id',
         'user_id',
+        'service_provider_id',
         'transaction_type',
         'amount',
         'description',
@@ -36,5 +37,10 @@ class Transaction extends Model
     public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);
+    }
+
+    public function serviceProvider(): BelongsTo
+    {
+        return $this->belongsTo(ServiceProvider::class);
     }
 }

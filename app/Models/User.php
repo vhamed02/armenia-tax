@@ -64,4 +64,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ScanningJob::class);
     }
+
+    public function casinoProfiles(): HasMany
+    {
+        return $this->hasMany(CasinoProfile::class);
+    }
+
+    public function walletTransactions(): HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
 }

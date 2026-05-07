@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             BankAccountSeeder::class,
             TransactionSeeder::class,
             AdminSeeder::class,
+            ServiceProviderSeeder::class,
         ]);
     }
 }
