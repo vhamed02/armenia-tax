@@ -20,13 +20,18 @@ class WithdrawModal extends Component
     public int $currentBalance = 0;
     public array $bankAccounts = [];
 
-    protected $listeners = ['openWithdrawModal' => 'openModal'];
+    protected $listeners = ['openWithdrawModal' => 'openModal', 'bankAccountAdded' => 'reloadAccounts'];
 
     public function openModal(): void
     {
         $this->reset(['amount', 'state', 'errorMessage', 'newBalance']);
         $this->loadData();
         $this->open = true;
+    }
+
+    public function reloadAccounts(): void
+    {
+        $this->loadData();
     }
 
     public function close(): void
