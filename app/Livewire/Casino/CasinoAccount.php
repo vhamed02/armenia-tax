@@ -3,19 +3,39 @@
 namespace App\Livewire\Casino;
 
 use App\Models\ServiceProvider;
+use App\Services\WalletService;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CasinoAccount extends Component
 {
     public array $profile = [];
     public array $walletTransactions = [];
+    public array $walletSummary = [];
     public string $kycStatus = 'not_started';
     public int $walletBalance = 0;
 
     public function mount(): void
     {
         $this->loadProfile();
+    }
+
+    #[On('walletUpdated')]
+    public function onWalletUpdated(int $balance): void
+    {
+        $this->walletBalance = $balance;
+        $this->loadProfile();
+    }
+
+    public function openDeposit(): void
+    {
+        $this->dispatch('openDepositModal');
+    }
+
+    public function openWithdraw(): void
+    {
+        $this->dispatch('openWithdrawModal');
     }
 
     private function loadProfile(): void
@@ -58,6 +78,9 @@ class CasinoAccount extends Component
                 'status'     => $t->status,
                 'created_at' => $t->created_at->format('M d, Y'),
             ])->toArray();
+
+        $walletService        = app(WalletService::class);
+        $this->walletSummary  = $walletService->getWalletSummary($casinoProfile);
     }
 
     public function render()
