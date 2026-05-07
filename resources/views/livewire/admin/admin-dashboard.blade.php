@@ -1,5 +1,5 @@
 <div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
         <div class="stat-card">
             <div class="stat-label">Users Monitored</div>
             <div class="stat-value" style="color:#1e88e5;">{{ $stats['total_users_monitored'] }}</div>
@@ -15,6 +15,25 @@
         <div class="stat-card">
             <div class="stat-label">Pending Reports</div>
             <div class="stat-value" style="color:#744210;">{{ $stats['reports_pending_submission'] }}</div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+        <div class="stat-card" style="border-top:3px solid #1e88e5;">
+            <div class="stat-label">Active Service Providers</div>
+            <div class="stat-value" style="color:#1e88e5;">{{ $tenantStats['active_service_providers'] }}</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid #38a169;">
+            <div class="stat-label">Casino Wallet Txs Today</div>
+            <div class="stat-value" style="color:#38a169;">{{ $tenantStats['casino_wallet_txs_today'] }}</div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid #f6ad55;">
+            <div class="stat-label">Total Wallet Volume</div>
+            <div class="stat-value" style="color:#f6ad55;font-size:20px;">{{ number_format($tenantStats['total_wallet_volume_amd']) }} <span style="font-size:13px;font-weight:400;color:#718096;">AMD</span></div>
+        </div>
+        <div class="stat-card" style="border-top:3px solid #e53e3e;">
+            <div class="stat-label">Cross-platform Over Limit</div>
+            <div class="stat-value" style="color:#e53e3e;">{{ $tenantStats['cross_platform_users_over_limit'] }}</div>
         </div>
     </div>
 
@@ -81,10 +100,42 @@
             </tbody>
         </table>
     </div>
+
+    @if(!empty($tenantStats['top_providers_today']))
+    <div class="card" style="margin-top:20px;">
+        <div style="padding:18px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:15px;font-weight:600;color:#1a202c;">Provider Activity Today</div>
+            <a href="{{ route('admin.tenants') }}" style="font-size:13px;color:#1e88e5;text-decoration:none;">View All →</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>Status</th>
+                    <th>Transactions Today</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($tenantStats['top_providers_today'] as $p)
+                    <tr>
+                        <td style="font-weight:500;">{{ $p['name'] }}</td>
+                        <td>
+                            @if($p['status'] === 'active')
+                                <span class="badge" style="background:#c6f6d5;color:#276749;">Active</span>
+                            @else
+                                <span class="badge" style="background:#fed7d7;color:#822727;">{{ ucfirst($p['status']) }}</span>
+                            @endif
+                        </td>
+                        <td style="font-weight:600;color:#1e88e5;">{{ $p['today_count'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('flaggedChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',

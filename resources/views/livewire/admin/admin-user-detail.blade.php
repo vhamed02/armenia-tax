@@ -77,4 +77,89 @@
             </tbody>
         </table>
     </div>
+
+    @if(!empty($platformActivity))
+    <div class="card" style="margin-bottom:24px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#1a202c;">Platform Activity</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>KYC Status</th>
+                    <th>Wallet Balance</th>
+                    <th>Total Deposited</th>
+                    <th>Total Withdrawn</th>
+                    <th>Last Activity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($platformActivity as $pa)
+                    <tr>
+                        <td>
+                            <div style="font-weight:500;">{{ $pa['provider_name'] }}</div>
+                            <div style="font-size:11px;color:#a0aec0;">{{ $pa['provider_slug'] }}</div>
+                        </td>
+                        <td>
+                            @if($pa['kyc_status'] === 'verified')
+                                <span class="badge" style="background:#c6f6d5;color:#276749;">✓ Verified</span>
+                            @elseif($pa['kyc_status'] === 'in_progress')
+                                <span class="badge" style="background:#fefcbf;color:#744210;">In Progress</span>
+                            @elseif($pa['kyc_status'] === 'failed')
+                                <span class="badge" style="background:#fed7d7;color:#822727;">Failed</span>
+                            @else
+                                <span class="badge" style="background:#e2e8f0;color:#4a5568;">Not Started</span>
+                            @endif
+                        </td>
+                        <td style="font-weight:600;color:#38a169;">{{ number_format($pa['wallet_balance']) }} AMD</td>
+                        <td style="color:#38a169;">{{ number_format($pa['total_deposited']) }} AMD</td>
+                        <td style="color:#e53e3e;">{{ number_format($pa['total_withdrawn']) }} AMD</td>
+                        <td style="font-size:12px;color:#718096;">{{ $pa['last_activity_at'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+
+    @if(!empty($walletHistory))
+    <div class="card" style="margin-bottom:24px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#1a202c;">Wallet Transaction History</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Provider</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance Before</th>
+                    <th>Balance After</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($walletHistory as $wt)
+                    <tr>
+                        <td style="font-size:12px;color:#718096;">{{ $wt['created_at'] }}</td>
+                        <td style="font-size:13px;">{{ $wt['provider_name'] }}</td>
+                        <td>
+                            <span style="background:{{ $wt['type']==='deposit' ? '#c6f6d5' : '#fed7d7' }};color:{{ $wt['type']==='deposit' ? '#276749' : '#822727' }};font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">
+                                {{ ucfirst($wt['type']) }}
+                            </span>
+                        </td>
+                        <td style="font-weight:600;color:{{ $wt['type']==='deposit' ? '#38a169' : '#e53e3e' }};">
+                            {{ $wt['type']==='deposit' ? '+' : '-' }}{{ number_format($wt['amount']) }} AMD
+                        </td>
+                        <td style="font-size:12px;color:#718096;">{{ number_format($wt['balance_before']) }}</td>
+                        <td style="font-size:12px;font-weight:500;">{{ number_format($wt['balance_after']) }}</td>
+                        <td>
+                            <span style="background:{{ $wt['status']==='completed' ? '#c6f6d5' : '#e2e8f0' }};color:{{ $wt['status']==='completed' ? '#276749' : '#4a5568' }};font-size:11px;padding:2px 8px;border-radius:4px;">
+                                {{ ucfirst($wt['status']) }}
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
 </div>

@@ -29,6 +29,18 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             Anomalies
         </a>
+        <a href="{{ route('admin.tenants') }}"
+           style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;text-decoration:none;margin-bottom:2px;font-size:14px;
+           {{ request()->routeIs('admin.tenants') ? 'background:#1e88e5;color:#ffffff;' : 'color:#a0aec0;' }}">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            Service Providers
+        </a>
+        <a href="{{ route('admin.transaction-log') }}"
+           style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;text-decoration:none;margin-bottom:2px;font-size:14px;
+           {{ request()->routeIs('admin.transaction-log') ? 'background:#1e88e5;color:#ffffff;' : 'color:#a0aec0;' }}">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Transaction Monitor
+        </a>
     </nav>
 
     <div style="padding:16px 20px;border-top:1px solid #1e2d45;">

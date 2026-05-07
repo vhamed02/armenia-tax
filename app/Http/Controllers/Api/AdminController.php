@@ -8,6 +8,7 @@ use App\Jobs\ScanUserTransactions;
 use App\Models\TaxReport;
 use App\Models\User;
 use App\Services\IncomeAnalyzer;
+use App\Services\MonitoringService;
 use App\Services\ReportingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,13 +18,18 @@ class AdminController extends Controller
     public function __construct(
         private readonly ReportingService $reporting,
         private readonly IncomeAnalyzer $analyzer,
+        private readonly MonitoringService $monitoring,
     ) {}
 
     public function dashboardStats(): JsonResponse
     {
-        $stats = $this->reporting->getDashboardStats();
+        $stats       = $this->reporting->getDashboardStats();
+        $tenantStats = $this->monitoring->getDashboardTenantStats();
 
-        $stats['total_tax_due_amd'] = ApiResponse::amd($stats['total_tax_due_amd']);
+        $stats['total_tax_due_amd']       = ApiResponse::amd($stats['total_tax_due_amd']);
+        $stats['tenant_count']            = $tenantStats['active_service_providers'];
+        $stats['total_wallet_volume_amd'] = ApiResponse::amd($tenantStats['total_wallet_volume_amd']);
+        $stats['cross_tenant_flagged_users'] = $tenantStats['cross_platform_users_over_limit'];
 
         return ApiResponse::success($stats);
     }

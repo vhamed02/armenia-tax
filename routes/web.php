@@ -6,6 +6,8 @@ use App\Http\Controllers\Web\LoginController;
 use App\Livewire\Admin\AdminAnomalies;
 use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\Admin\AdminReports;
+use App\Livewire\Admin\AdminTenants;
+use App\Livewire\Admin\AdminTransactionLog;
 use App\Livewire\Admin\AdminUserDetail;
 use App\Livewire\Admin\AdminUsers;
 use App\Livewire\Casino\CasinoAccount;
@@ -28,6 +30,8 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::get('/anomalies', AdminAnomalies::class)->name('anomalies');
     Route::get('/users', AdminUsers::class)->name('users');
     Route::get('/users/{id}', AdminUserDetail::class)->name('users.detail');
+    Route::get('/tenants', AdminTenants::class)->name('tenants');
+    Route::get('/transaction-log', AdminTransactionLog::class)->name('transaction-log');
 });
 
 Route::middleware('auth')->prefix('portal')->name('portal.')->group(function () {
