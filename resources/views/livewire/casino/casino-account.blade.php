@@ -152,7 +152,6 @@
                 @endif
             </div>
         </div>
-    </div>
 
         <livewire:casino.bank-account-manager />
     </div>
